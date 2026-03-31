@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from database import engine, Base, SessionLocal
 from parser import load_all_products
 from crud import create_or_update_product
@@ -9,6 +10,11 @@ from crud import get_analytics
 app = FastAPI()
 
 Base.metadata.create_all(bind=engine)
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return {}
 
 
 @app.get("/")
@@ -47,6 +53,11 @@ def list_products(
     return products
 
 
+@app.get("/product")
+def get_product_redirect():
+    return RedirectResponse(url="/products")
+
+
 @app.get("/product/{product_id}")
 def get_product(product_id: int):
     db = SessionLocal()
@@ -65,3 +76,7 @@ def analytics():
     result = get_analytics(db)
     db.close()
     return result
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

@@ -34,15 +34,20 @@ def create_or_update_product(db: Session, product_data: dict):
 
     # EXISTING PRODUCT → check price change
     if existing.current_price != product_data["price"]:
-        existing.current_price = product_data["price"]
+        old_price = existing.current_price
+        new_price = product_data["price"]
+
+        existing.current_price = new_price
         db.commit()
 
         history = PriceHistory(
             product_id=existing.id,
-            price=existing.current_price
+            price=new_price
         )
         db.add(history)
         db.commit()
+
+        print(f"PRICE CHANGE: {existing.name} | {old_price} → {new_price}")
 
         return "updated"
 

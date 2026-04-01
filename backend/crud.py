@@ -1,6 +1,6 @@
 # crud.py
 from sqlalchemy.orm import Session
-from models import Product, PriceHistory
+from models import Product, PriceHistory, PriceEventLog
 
 
 def create_or_update_product(db: Session, product_data: dict):
@@ -49,7 +49,21 @@ def create_or_update_product(db: Session, product_data: dict):
 
         print(f"PRICE CHANGE: {existing.name} | {old_price} → {new_price}")
 
-        return "updated"
+        # NEW EVENT LOG: write the notification directly to the generic database
+        event_log = PriceEventLog(
+            product_name=existing.name,
+            old_price=old_price,
+            new_price=new_price
+        )
+        db.add(event_log)
+        db.commit()
+
+        return {
+            "status": "updated",
+            "name": existing.name,
+            "old_price": old_price,
+            "new_price": new_price
+        }
 
     return "no_change"
 

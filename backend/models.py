@@ -27,3 +27,21 @@ class PriceHistory(Base):
     timestamp = Column(DateTime, default=datetime.utcnow)
 
     product = relationship("Product", back_populates="price_history")
+
+
+class APIUser(Base):
+    __tablename__ = "api_users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    api_key = Column(String, unique=True, index=True)
+    usage_count = Column(Integer, default=0)
+
+
+class PriceEventLog(Base):
+    __tablename__ = "price_events"
+
+    id = Column(Integer, primary_key=True, index=True)
+    product_name = Column(String)
+    old_price = Column(Float)
+    new_price = Column(Float)
+    timestamp = Column(DateTime, default=datetime.utcnow)
